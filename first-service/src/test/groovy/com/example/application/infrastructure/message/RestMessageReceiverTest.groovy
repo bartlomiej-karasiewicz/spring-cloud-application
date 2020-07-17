@@ -1,10 +1,12 @@
 package com.example.application.infrastructure.message
 
 import com.example.application.domain.message.MessageManager
-import com.example.application.domain.model.message.Message
 import com.github.tomakehurst.wiremock.junit.WireMockRule
 import org.junit.Rule
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
@@ -14,15 +16,15 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*
         properties = [
                 'spring.cloud.config.enabled=false',
                 'eureka.client.enabled=false',
+                'secondService.address=http://localhost:8082/message/'
         ])
 class RestMessageReceiverTest extends Specification {
 
     @Rule
     WireMockRule wireMockRule = new WireMockRule(8082)
 
-    RestTemplate restTemplate = new RestTemplate()
-
-    MessageManager manager = new RestMessageReceiver(restTemplate)
+    @Autowired
+    RestMessageReceiver restMessageReceiver
 
     def "Should receive message basing on the response content"() {
         given:
@@ -33,8 +35,16 @@ class RestMessageReceiverTest extends Specification {
                 )
         )
         when:
-        def collect = manager.sendAndCollect(1)
+        def collect = restMessageReceiver.sendAndCollect(1)
         then:
-        println collect
+        collect.getId()==1 && collect.getMessage()=="HELLO"
+    }
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        RestTemplate restTemplate() {
+            return new RestTemplate()
+        }
     }
 }
