@@ -22,7 +22,7 @@
 		<swagger.version>2.9.2</swagger.version>
 		<swagger-ui.version>2.9.2</swagger-ui.version>
 		<spock-spring.version>1.3-groovy-2.4</spock-spring.version>
-		<groovy.version>2.4.7</groovy.version>
+		<groovy.version>2.4.21</groovy.version>
 		<cglib.version>3.2.4</cglib.version>
 	</properties>
 
